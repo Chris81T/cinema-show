@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>
+<html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>
+<html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>
+<html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js"> <!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>the cinema show!</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width">
+
+    <link rel="stylesheet" href="css/normalize.min.css">
+    <link rel="stylesheet" href="css/main.css">
+
+    <script src="js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
+
+    <script src="angular-1.0.7/angular.js"></script>
+    <script src="angular-1.0.7/angular-resource.js"></script>
+
+</head>
+<body ng-app="CinemaApp">
+<!--[if lt IE 7]>
+<p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade
+    your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to
+    improve your experience.</p>
+<![endif]-->
+
+<div class="header-container">
+    <header class="wrapper clearfix">
+        <h1 class="title">The cinema show !</h1>
+    </header>
+</div>
+
+<div class="main-container" ng-controller="CinemaController">
+    <div class="main wrapper clearfix" ng-cloak>
+        <header>
+            <h2>The Movies</h2>
+        </header>
+        <div ng-repeat="movie in movies">
+            {{movie}} <br/>
+        </div>
+
+        <header>
+            <h2>Cinema rooms</h2>
+        </header>
+
+        <form>
+            <input ng-model="roomName"/>
+            <input ng-model="roomSeatsSize"/>
+            <button ng-click="createRoom()">create new room</button>
+        </form>
+
+        <hr/>
+
+        <form>
+            <input ng-model="roomName"/>
+            <input ng-model="roomSeatsSize"/>
+            <input ng-model="count"/>
+            <button ng-click="createRoomMultiple()">create new room multiple</button>
+        </form>
+
+    </div>
+    <!-- #main -->
+</div>
+<!-- #main-container -->
+<script>
+    var cinemaApp = angular.module('CinemaApp', ['ngResource', 'RestModule']);
+
+    angular.module('RestModule', ['ngResource']).factory("RestService", function ($resource) {
+        function rest() {
+        };
+
+        rest.getMovies = function (callback) {
+            return $resource('rest/cinema-api/movies').
+                    query(function (movies) {
+                        callback(movies);
+                    });
+        }
+
+        rest.getMovie = function (movieId, callback) {
+            return $resource('rest/cinema-api/movies/movie/:id').
+                    get({id: movieId}, function (movie) {
+                        callback(movie);
+                    });
+        }
+
+        rest.createRoom = function (roomName, seatsSize, callback) {
+            return $resource('rest/cinema-api/rooms/room/:name',
+                    {name: roomName, seats: seatsSize})
+                    .save(function () {
+                        if (callback !== undefined) callback();
+                    });
+        }
+
+        rest.createRoomMultiple = function (roomName, seatsSize, callback, count) {
+            return $resource('rest/cinema-api/rooms/room/multiple/:name',
+                    {name: roomName, seats: seatsSize})
+                    .save({count: 5}, function () {
+                        if (callback !== undefined) callback();
+                    });
+        }
+
+        rest.getRoom = function (id, callback) {
+            return $resource('rest/cinema-api/rooms/room/:id')
+                    .get({id: id}, function (room) {
+                        callback(room);
+                    });
+        }
+
+        return rest;
+    })
+
+    function CinemaController($scope, RestService) {
+
+        $scope.movies = [];
+
+        RestService.getMovies(function (movies) {
+            $scope.movies = movies;
+        });
+
+        $scope.createRoom = function () {
+            console.log("create room...");
+            RestService.createRoomMultiple($scope.roomName, $scope.roomSeatsSize, function () {
+                alert("room is created");
+            })
+        }
+
+        $scope.createRoomMultiple = function () {
+            console.log("create room multiple...");
+            RestService.createRoomMultiple(
+                    $scope.roomName,
+                    $scope.roomSeatsSize,
+                    function () {
+                        alert("room is [" + $scope.count + "] times created");
+                    },
+                    $scope.count)
+        }
+    }
+</script>
+<div class="footer-container">
+    <footer class="wrapper">
+        <h3>This is the end my friend...</h3>
+    </footer>
+</div>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="js/vendor/jquery-1.9.1.min.js"><\/script>')</script>
+
+<script src="js/main.js"></script>
+
+<script>
+    var _gaq = [
+        ['_setAccount', 'UA-XXXXX-X'],
+        ['_trackPageview']
+    ];
+    (function (d, t) {
+        var g = d.createElement(t), s = d.getElementsByTagName(t)[0];
+        g.src = ('https:' == location.protocol ? '//ssl' : '//www') + '.google-analytics.com/ga.js';
+        s.parentNode.insertBefore(g, s)
+    }(document, 'script'));
+</script>
+</body>
+</html>
