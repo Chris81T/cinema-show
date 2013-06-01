@@ -7,7 +7,7 @@
 
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
 
-        <jta-data-source>java:jboss/datasources/dks.datasource</jta-data-source>
+        <jta-data-source>java:jboss/datasources/zmw.datasource</jta-data-source>
 
         <class>de.geeksession.entities.AbstractEntity</class>
         <class>de.geeksession.entities.CinemaRoom</class>
